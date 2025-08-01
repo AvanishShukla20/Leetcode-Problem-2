@@ -11,22 +11,22 @@
  */
 class Solution {
 public:
-    //Best approach till seen 
-    int result = 0;
-    int helper(TreeNode* node)
+    int solve(TreeNode* root, int& ans)
     {
-        if(node == NULL) return 0;
-       int leftPath = helper(node->left);
-       int rightPath = helper(node->right);
-        // root is included
-       result = max(result, leftPath + rightPath);
+        if(!root) return -1;
 
-       return 1 + max(leftPath, rightPath);
+        int l = 1 + solve(root->left, ans);
+        int r = 1 + solve(root->right, ans);
+        
+        int toreturn = 0;
+        
+        toreturn = max({toreturn, l, r});
+        ans = max({ans, l + r, toreturn});
+        return toreturn;
     }
-
     int diameterOfBinaryTree(TreeNode* root) {
-       if(root == NULL) return 0;
-        helper(root);
-       return result;
+        int ans = 0;
+        solve(root, ans);
+        return ans;
     }
 };
