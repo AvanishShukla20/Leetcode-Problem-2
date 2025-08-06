@@ -1,34 +1,36 @@
 class Solution {
 public:
-    bool solve(int i, int j,  string& s, vector<vector<int>>& dp)
+    int expandAroundCenter(int left, int right, string& s) 
     {
-        if(i > j) return true;
-        if(dp[i][j] != -1) return dp[i][j];
+        int n=s.size();
+        while(left >= 0 && right < n && s[left] == s[right]) {
+            left--;
+            right++;
+        }
+        // return length of palindrome
+        return right - left - 1; // because left and right now point outside palindrome
+        };
 
-        if(s[i] == s[j]) return dp[i][j] = solve(i+1, j-1, s, dp);
-        return dp[i][j] = false;
-    }
     string longestPalindrome(string s) {
         int n = s.size();
-        int idx = 0, maxlen = INT_MIN;
-        vector<vector<int>> dp(n+1, vector<int>(n+1, -1));
-        for(int i=0; i<n; i++)
-        {
-            for(int j=i; j<n; j++)
-            {
-                if(solve(i, j, s, dp) == true)
-                {
-                    if(j-i+1 > maxlen)
-                    {
-                        maxlen = j-i+1;
-                        idx = i;
-                    }
-                }
+        if(n == 0) return "";
+
+        int start = 0, maxLen = 1;
+
+
+        for(int i = 0; i < n; i++) {
+            
+            int len1 = expandAroundCenter(i, i, s);     // Odd-length palindrome
+            int len2 = expandAroundCenter(i, i + 1, s); // Even-length palindrome
+
+            int len = max(len1, len2);
+
+            if(len > maxLen) {
+                maxLen = len;
+                start = i - (len - 1) / 2; // calculate start index
             }
         }
 
-        string ans = s.substr(idx, maxlen);
-        return ans;
-
+        return s.substr(start, maxLen);
     }
 };
