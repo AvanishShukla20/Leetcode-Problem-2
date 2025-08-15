@@ -1,59 +1,44 @@
 class Solution {
 public:
-    bool dfs(int node, vector<bool>& vis,vector<bool>& path, vector<bool>& ans, vector<vector<int>>& adj)
+    bool isCycle(int node, vector<int>& vis,vector<bool>& inRecursion, vector<vector<int>>& graph)
     {
         vis[node] = 1;
-        path[node] = 1;
-
-        for(int it : adj[node])
+        inRecursion[node] = true;
+        bool rec;
+        for(auto &it : graph[node])
         {
-            // If neighbor is in current path -> cycle
-            if (path[it]) {
-                ans[node] = false;
-                return false;
+            if(!vis[it])
+            {  
+                if(isCycle(it, vis,inRecursion, graph)) return true;
             }
-            // If neighbor not visited, explore
-            if (!vis[it]) {
-                if (!dfs(it, vis, path, ans, adj)) {
-                    ans[node] = false;
-                    return false;
-                }
-            }
-            // If neighbor visited but unsafe
-            else if (!ans[it]) {
-                ans[node] = false;
-                return false;
+            else if(inRecursion[it] == true)
+            {
+                return true;
             }
         }
 
-        path[node] = 0;
-        ans[node] = true;
-
-        return true;
+        inRecursion[node] = false;
+        return false;
     }
-    vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph){
         int n = graph.size();
-        vector<bool> ans(n, false);
-        vector<bool> vis(n, false);
-        vector<bool> inpath(n, false);
+        vector<int> vis(n, 0);
+        vector<bool> inRecursion(n);
 
-        vector<int> res;
-
-        for(int i=0; i<n; i++)
+        for(int i = 0; i< n; i++)
         {
             if(!vis[i])
             {
-                dfs(i, vis, inpath, ans, graph);
+                isCycle(i, vis, inRecursion, graph);
             }
         }
 
-        for(int i=0; i<n; i++)
+        vector<int> ans;
+        for(int i = 0; i < inRecursion.size(); i++)
         {
-            if(ans[i] == true)
-            {
-                res.push_back(i);
-            }
+            if(inRecursion[i] == false) ans.push_back(i);
         }
-        return res;
+
+        return ans;
     }
 };
