@@ -1,44 +1,41 @@
 class Solution {
 public:
-    bool isCycle(int node, vector<int>& vis,vector<bool>& inRecursion, vector<vector<int>>& graph)
-    {
-        vis[node] = 1;
-        inRecursion[node] = true;
-        bool rec;
-        for(auto &it : graph[node])
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+        int n = graph.size();
+        vector<vector<int>> revgraph(n);
+        vector<int> indegree(n, 0);
+        queue<int> Q;
+        for(int u = 0; u<n; u++)
         {
-            if(!vis[it])
-            {  
-                if(isCycle(it, vis,inRecursion, graph)) return true;
-            }
-            else if(inRecursion[it] == true)
+            for(auto v : graph[u])
             {
-                return true;
+                revgraph[v].push_back(u);
+                indegree[u]++;
             }
         }
 
-        inRecursion[node] = false;
-        return false;
-    }
-    vector<int> eventualSafeNodes(vector<vector<int>>& graph){
-        int n = graph.size();
-        vector<int> vis(n, 0);
-        vector<bool> inRecursion(n);
-
-        for(int i = 0; i< n; i++)
+        for(int i=0; i<n; i++)
         {
-            if(!vis[i])
-            {
-                isCycle(i, vis, inRecursion, graph);
-            }
+            if(indegree[i] == 0) Q.push(i);
         }
 
         vector<int> ans;
-        for(int i = 0; i < inRecursion.size(); i++)
+        //bfs kahn's-traversal
+
+        while(!Q.empty())
         {
-            if(inRecursion[i] == false) ans.push_back(i);
+            int frontV = Q.front();
+            Q.pop();
+            ans.push_back(frontV);
+
+            for(auto it : revgraph[frontV])
+            {
+                indegree[it]--;
+                if(indegree[it] == 0) Q.push(it);
+            }
         }
 
+        sort(ans.begin(), ans.end());
         return ans;
     }
 };
