@@ -31,8 +31,7 @@ public:
 
         for(int i=1; i<=n; i++)
         {
-            if(cost[i] == INT_MAX) return -1;
-            if(i == k) continue;
+            if(cost[i] == INT_MAX || i == k) continue;
             mincost = max(mincost, cost[i]);
         }
 
