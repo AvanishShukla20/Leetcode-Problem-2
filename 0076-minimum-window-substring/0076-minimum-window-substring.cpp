@@ -1,46 +1,40 @@
 class Solution {
 public:
-    bool check(unordered_map<char, int>& present, unordered_map<char, int>&  required)
-    {
-        for(auto &it : required)
-        {
-           if(present[it.first] < it.second) return false;
-        }
-        return true;
-    }
     string minWindow(string s, string t) {
-        // vector<int> store(26, 0), temp(26, 0);
-        unordered_map<char , int> required, present;
-
-        for(auto u : t) required[u-'a']++;
-
-        int i=0, j=0, n = s.size();
-        int start_idx = -1;
-        int len = INT_MAX;
+        int n = s.size();
+        unordered_map<char, int> mpp;
+        for(int i=0; i<t.size(); i++) mpp[t[i]]++;
+        int lenrequired = t.size();
+        int minWindow = 1e8;
+        int res_i = 0;
+        int i=0, j= 0;
         while(j < n)
         {
             char ch = s[j];
-            present[ch-'a']++;
-
-            while(i <= j && check(present , required) == true)
+            //if frequency of any character in our map is > 0 it means it should be part of our valid substring
+            if(mpp[ch] > 0)
             {
-                if(j-i+1 <= len)
-                {
-                    len = j-i+1;
-                    start_idx = i;
-                }
+                lenrequired--;
+            }
+            mpp[ch]--;
 
-                present[s[i]-'a']--;
+            while(i <= j && lenrequired == 0)
+            {
+                char ch1 = s[i];
+
+                int currWindow = j - i + 1;
+                mpp[ch1]++;
+                if(currWindow < minWindow)
+                {
+                    minWindow = currWindow;
+                    res_i = i;
+                }
+                if(mpp[ch1] > 0) lenrequired++;
                 i++;
             }
-
             j++;
         }
 
-        cout<<start_idx<<endl;
-        if(start_idx == -1) return "";
-
-        string ans = s.substr(start_idx, len);
-        return ans;
+        return (minWindow == 1e8) ? "" : s.substr(res_i, minWindow);
     }
 };
