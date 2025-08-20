@@ -1,39 +1,30 @@
 class Solution {
 public:
     int characterReplacement(string s, int k) {
-        int i =0, j = 0;
-        int maxfreq = 0;
-        int windowSize = 0, ans = 0;
-
-        if(k >= s.size()) return s.size();
-
+        int n = s.size();
         vector<int> hash(26, 0);
+        int i =0, maxlen = 0, maxfreq = 0, changes;
 
-        while(j < s.size())
+        for(int j=0; j<n; j++)
         {
-            hash[s[j] - 'A']++;
-            windowSize = j - i + 1;
-            maxfreq = max(maxfreq, hash[s[j] - 'A']);
+            hash[s[j]-'A']++;
+            maxfreq = max(maxfreq, hash[s[j]-'A']);
+            changes = (j-i+1) - maxfreq;
 
-            if(windowSize - maxfreq <= k)
+            while(changes > k)
             {
-                cout<<"increase : "<<windowSize<<endl;
-                ans = max(ans, windowSize);
+                hash[s[i]-'A']--;
+                // recalculate maxfreq for correctness
+                maxfreq = 0;
+                for(int l=0; l<26; l++) maxfreq = max(maxfreq, hash[l]);
+                i++;
+                changes = (j-i+1) - maxfreq;
             }
-            else
-            {
-                while(i < j && windowSize - maxfreq > k)
-                {
-                    hash[s[i] - 'A']--; 
-                    maxfreq = max(maxfreq, hash[s[i] - 'A']);
-                    i++;
-                    windowSize = j - i + 1;
-                }
-                ans = max(ans, windowSize);
-            }
-            j++;
+            maxlen = max(maxlen, j-i+1);
+
         }
 
-        return ans;
+
+        return maxlen;
     }
 };
