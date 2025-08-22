@@ -1,50 +1,28 @@
 class Solution {
-public:
-    int maxProfit(vector<int>& prices) {
-        int n = prices.size();
-        vector<vector<vector<int>>> dp(n+1, vector<vector<int>> (2, vector<int> (3, -1)));
+public: 
+    int solve(int idx, int buy, int k, vector<int>& prices, vector<vector<vector<int>>>& dp)
+    {
+        if(k == 2) return 0;
+        if(idx == prices.size()) return 0;
+        if(dp[idx][buy][k] != -1) return dp[idx][buy][k];
+        int maxi = 0;
 
-        for(int i = 0; i <= n; i++)
+        if(buy == 0)
         {
-            dp[i][0][2] = 0;
-            dp[i][1][2] = 0;
-        }
-
-        for(int b = 0; b<=1; b++)
-        {
-            for(int c = 0; c <= 2; c++)
-            {
-                dp[n][b][c] = 0;
-            }
-        }
-
-
-        for(int idx = n-1; idx >= 0; idx--)
-        {
-            for(int buy = 0; buy <= 1; buy++)
-            {
-                for(int cap = 1; cap >= 0; cap--)
-                {
-                    int profit = 0;
-
-        if(buy)
-        {
-            int Buythis = -prices[idx] + dp[idx+1][0][cap]; 
-            int notBuythis = 0 + dp[idx+1][1][cap];
-            profit = max(Buythis, notBuythis);
+            maxi = -prices[idx] + max(maxi, solve(idx+1, 1, k, prices, dp));
+            maxi = max(maxi, solve(idx+1, 0, k, prices, dp));
         }
         else
         {
-            int sellthis = prices[idx] + dp[idx+1][1][cap+1];
-            int notsellthis = 0 + dp[idx+1][0][cap];
-            profit = max(sellthis, notsellthis);
-        }
+            maxi = prices[idx] + max(maxi, solve(idx+1, 0, k+1, prices, dp));
+            maxi = max(maxi, solve(idx+1, 1, k, prices, dp));
+        } 
+        return dp[idx][buy][k] = maxi;
+    }
 
-        dp[idx][buy][cap] = profit;
-                }
-            }
-        }
-
-        return dp[0][1][0];
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        vector<vector<vector<int>>> dp(n+1, vector<vector<int>> (2, vector<int> (3, -1)));
+        return solve(0, 0, 0, prices, dp);
     }
 };
